@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from './Logo';
+import { AuthContext } from '../context/AuthContext';
 
 const Header = () => {
   const location = useLocation();
@@ -21,6 +22,14 @@ const Header = () => {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -52,6 +61,20 @@ const Header = () => {
               </Link>
             </li>
           ))}
+          <li>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <div className="text-sm text-gray-700">{user.name}</div>
+                <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors">
+                  Se déconnecter
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" className="text-sm font-medium text-primary hover:opacity-90">
+                Se connecter
+              </Link>
+            )}
+          </li>
         </ul>
 
         {/* Mobile menu button */}
@@ -108,6 +131,16 @@ const Header = () => {
                   </Link>
                 </motion.li>
               ))}
+              <li>
+                {user ? (
+                  <div className="flex items-center justify-between">
+                    <div className="text-base font-medium text-gray-700">{user.name}</div>
+                    <button onClick={() => { closeMobileMenu(); handleLogout(); }} className="text-sm font-medium text-red-500">Se déconnecter</button>
+                  </div>
+                ) : (
+                  <Link to="/login" onClick={closeMobileMenu} className="block text-base font-medium text-primary">Se connecter</Link>
+                )}
+              </li>
             </ul>
           </motion.div>
         )}
